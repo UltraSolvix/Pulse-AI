@@ -1073,7 +1073,7 @@
       // Create hydration total display
       const hydrationTotal = document.createElement('div');
       hydrationTotal.classList.add('hydration-total');
-      hydrationTotal.textContent = `الترطيب اليومي المقدر: ${base.toFixed(2)} لتر`;
+      hydrationTotal.textContent = `The estimated daily hydration: ${base.toFixed(2)} liter`;
       container.appendChild(hydrationTotal);
       setTimeout(() => hydrationTotal.classList.add('show'), 50);
 
@@ -1119,142 +1119,93 @@
           downloadBtn.classList.add("busy");
           downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-          const clone = scheduleDiv.cloneNode(true);
-          const hydrationClone = hydrationTotal.cloneNode(true);
-          const btnContainerInClone = clone.querySelector('.button-container');
-          if (btnContainerInClone) btnContainerInClone.remove();
-          const checkboxes = clone.querySelectorAll('input[type="checkbox"]');
-          checkboxes.forEach(cb => cb.remove());
+          // إنشاء نسخة من جدول Your Program فقط للتصوير
+          const scheduleClone = document.createElement('div');
+          scheduleClone.style.position = 'absolute';
+          scheduleClone.style.left = '-99999px';
+          scheduleClone.style.top = '0';
+          scheduleClone.style.width = '400px';
+          scheduleClone.style.height = 'auto';
+          scheduleClone.style.background = '#000000';
+          scheduleClone.style.border = '3px solid #00ffff';
+          scheduleClone.style.color = '#00ffff';
+          scheduleClone.style.fontFamily = '"Almarai", "Noto Naskh Arabic", Arial, sans-serif';
+          scheduleClone.style.fontWeight = '900';
+          scheduleClone.style.direction = 'rtl';
+          scheduleClone.style.textAlign = 'center';
+          scheduleClone.style.padding = '20px';
+          scheduleClone.style.borderRadius = '16px';
+          scheduleClone.style.boxShadow = '0 10px 30px rgba(0, 255, 255, 0.6)';
+          scheduleClone.style.margin = '0 auto';
+          scheduleClone.style.display = 'flex';
+          scheduleClone.style.flexDirection = 'column';
+          scheduleClone.style.alignItems = 'center';
 
-          const isMobile = window.innerWidth <= 480;
-          const baseWidth = isMobile ? window.innerWidth * 0.90 : Math.min(window.innerWidth * 0.85, 620);
-          const fontSize = isMobile ? 18 : 20;
-          const titleFontSize = isMobile ? 22 : 24;
-          const padding = isMobile ? 15 : 20;
-          const linePadding = isMobile ? 8 : 10;
-          const lineMargin = isMobile ? 8 : 10;
+          // إضافة عنوان الجدول فقط
+          const title = document.createElement('h2');
+          title.textContent = 'Your Program';
+          title.style.fontSize = '24px';
+          title.style.marginBottom = '20px';
+          title.style.color = '#00ffff';
+          title.style.fontWeight = '900';
+          title.style.textAlign = 'center';
+          title.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.4)';
+          scheduleClone.appendChild(title);
 
-          // Style the hydration total for the snapshot
-          hydrationClone.style.background = 'rgba(0, 0, 0, 0.4)';
-          hydrationClone.style.border = '2px solid #00ffff';
-          hydrationClone.style.borderRadius = '12px';
-          hydrationClone.style.padding = `${isMobile ? 8 : 10}px ${isMobile ? 12 : 15}px`;
-          hydrationClone.style.marginBottom = '15px';
-          hydrationClone.style.fontSize = `${isMobile ? 0.9 : 1.1}rem`;
-          hydrationClone.style.fontWeight = '900';
-          hydrationClone.style.color = '#00ffff';
-          hydrationClone.style.textAlign = 'center';
-          hydrationClone.style.boxShadow = '0 4px 15px rgba(0, 255, 255, 0.5)';
-          hydrationClone.style.opacity = '1';
-
-          const wrapper = document.createElement('div');
-          wrapper.appendChild(hydrationClone);
-          wrapper.appendChild(clone);
-
-          wrapper.style.position = 'absolute';
-          wrapper.style.left = '-99999px';
-          wrapper.style.top = '0';
-          wrapper.style.width = `${baseWidth}px`;
-          wrapper.style.height = 'auto';
-          wrapper.style.minHeight = 'fit-content';
-          wrapper.style.background = '#000000';
-          wrapper.style.border = '3px solid #00ffff';
-          wrapper.style.color = '#00ffff';
-          wrapper.style.fontFamily = '"Almarai", "Noto Naskh Arabic", Arial, sans-serif';
-          wrapper.style.fontWeight = '900';
-          wrapper.style.direction = 'rtl';
-          wrapper.style.textAlign = 'center';
-          wrapper.style.letterSpacing = '0.5px';
-          wrapper.style.wordSpacing = 'normal';
-          wrapper.style.unicodeBidi = 'embed';
-          wrapper.style.textRendering = 'optimizeLegibility';
-          wrapper.style.webkitFontSmoothing = 'antialiased';
-          wrapper.style.mozOsxFontSmoothing = 'grayscale';
-          wrapper.style.fontKerning = 'normal';
-          wrapper.style.padding = `${padding}px`;
-          wrapper.style.borderRadius = '16px';
-          wrapper.style.boxShadow = '0 10px 30px rgba(0, 255, 255, 0.6)';
-          wrapper.style.margin = '0 auto';
-          wrapper.style.display = 'flex';
-          wrapper.style.flexDirection = 'column';
-          wrapper.style.alignItems = 'center';
-
-          const title = clone.querySelector('strong');
-          if (title) {
-            title.style.fontSize = `${titleFontSize}px`;
-            title.style.marginBottom = '20px';
-            title.style.display = 'block';
-            title.style.color = '#00ffff';
-            title.style.fontWeight = '900';
-            title.style.textAlign = 'center';
-            title.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.4)';
-          }
-
-          const lines = clone.querySelectorAll('.schedule-line');
-          lines.forEach(line => {
+          // إضافة عناصر الجدول فقط (الوقت والكمية)
+          schedule.forEach(([name, ml, time, time24, isChecked]) => {
+            const line = document.createElement('div');
             line.style.display = 'flex';
-            line.style.flexDirection = 'column';
+            line.style.justifyContent = 'space-between';
             line.style.alignItems = 'center';
             line.style.width = '100%';
-            line.style.maxWidth = '420px';
-            line.style.padding = `${linePadding}px`;
-            line.style.margin = `${lineMargin}px auto`;
+            line.style.padding = '10px';
+            line.style.margin = '8px 0';
             line.style.background = 'linear-gradient(135deg, rgba(0, 255, 255, 0.25), rgba(106, 17, 203, 0.25))';
             line.style.boxShadow = '0 2px 10px rgba(0, 255, 255, 0.3)';
-            const timeMl = line.querySelector('.time-ml');
-            if (timeMl) {
-              timeMl.style.display = 'flex';
-              timeMl.style.justifyContent = 'space-between';
-              timeMl.style.width = '100%';
-            }
-            const spans = line.querySelectorAll('span');
-            spans.forEach(span => {
-              span.style.display = 'inline-block';
-              span.style.fontSize = `${fontSize}px`;
-              span.style.fontWeight = '900';
-              span.style.color = '#00ffff';
-              span.style.whiteSpace = 'nowrap';
-              span.style.overflow = 'visible';
-              span.style.unicodeBidi = 'embed';
-              span.style.textAlign = 'center';
-              span.style.width = '50%';
-              span.style.opacity = '0.95';
-              span.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.3)';
-            });
+            line.style.borderRadius = '12px';
+
+            const timeSpan = document.createElement('span');
+            timeSpan.textContent = time;
+            timeSpan.style.fontSize = '18px';
+            timeSpan.style.fontWeight = '900';
+            timeSpan.style.color = '#00ffff';
+            timeSpan.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.3)';
+
+            const mlSpan = document.createElement('span');
+            mlSpan.textContent = `${ml} mL`;
+            mlSpan.style.fontSize = '18px';
+            mlSpan.style.fontWeight = '900';
+            mlSpan.style.color = '#00ffff';
+            mlSpan.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.3)';
+
+            line.appendChild(timeSpan);
+            line.appendChild(mlSpan);
+            scheduleClone.appendChild(line);
           });
 
-          document.body.appendChild(wrapper);
-          wrapper.offsetHeight;
-          await document.fonts.load(`900 ${fontSize}px Almarai`);
-          await document.fonts.load(`900 ${fontSize}px "Noto Naskh Arabic"`);
+          document.body.appendChild(scheduleClone);
+          await document.fonts.load(`900 18px Almarai`);
+          await document.fonts.load(`900 18px "Noto Naskh Arabic"`);
           await document.fonts.ready;
           await new Promise(resolve => setTimeout(resolve, 300));
 
-          const pixelRatio = window.devicePixelRatio || 1;
-          const scale = isMobile ? 4 : 3;
-          const canvasWidth = Math.round(wrapper.getBoundingClientRect().width * scale);
-          const canvasHeight = Math.round(wrapper.getBoundingClientRect().height * scale);
-          const opts = {
-            scale: scale,
+          const canvas = await html2canvas(scheduleClone, {
+            scale: 3,
             useCORS: true,
             allowTaint: true,
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            logging: false,
-            width: canvasWidth / scale,
-            height: canvasHeight / scale,
-            windowWidth: wrapper.scrollWidth,
-            windowHeight: wrapper.scrollHeight
-          };
+            backgroundColor: '#000000',
+            logging: false
+          });
 
-          const canvas = await html2canvas(wrapper, opts);
-          wrapper.remove();
+          scheduleClone.remove();
 
           canvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             const now = new Date();
             const pad = n => n.toString().padStart(2, '0');
-            const fname = `hydration_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.png`;
+            const fname = `Your_Program_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.png`;
             link.download = fname;
             link.href = url;
             document.body.appendChild(link);
@@ -1266,7 +1217,7 @@
               downloadBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
               downloadBtn.classList.remove("busy");
             }, 1200);
-            setTimeout(() => playAudio(audioFiles.download), 3000);
+            setTimeout(() => playAudio(audioFiles.download), 300);
           }, 'image/png', 1.0);
 
         } catch (err) {
