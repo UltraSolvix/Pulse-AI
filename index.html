@@ -23,6 +23,7 @@
       min-height: 100vh;
       color: #0ff;
       overflow: auto;
+      touch-action: manipulation; /* Improves touch responsiveness */
     }
 
     .container {
@@ -37,8 +38,8 @@
       display: flex;
       flex-direction: column;
       padding: 25px;
-      transform: translateY(-10px);
-      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+      transform: translateY(0); /* Adjusted for smoother initial rendering */
+      transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.6s ease; /* Smoother transitions */
       opacity: 0;
       pointer-events: none;
       overflow: visible;
@@ -50,7 +51,7 @@
     }
 
     .container:hover {
-      transform: translateY(-15px);
+      transform: translateY(-10px);
       box-shadow: 0 12px 40px rgba(0, 255, 255, 0.7), 0 0 60px rgba(0, 255, 255, 0.5);
     }
 
@@ -66,7 +67,7 @@
       align-items: center;
       z-index: 9999;
       opacity: 1;
-      transition: opacity 0.7s ease;
+      transition: opacity 0.8s ease; /* Smoother splash fade */
     }
 
     #splash.hide {
@@ -88,7 +89,7 @@
       overflow: hidden;
       transform: scale(0.7);
       opacity: 0;
-      transition: all 1s ease;
+      transition: all 1.2s ease; /* Smoother splash card animation */
     }
 
     #splashCard.show {
@@ -118,7 +119,7 @@
       font-family: 'Almarai', "Noto Naskh Arabic", Arial, sans-serif;
       color: #fff;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease; /* Smoother button transition */
       box-shadow: 0 6px 15px rgba(0, 255, 255, 0.5);
     }
 
@@ -144,11 +145,11 @@
       max-width: 600px;
       margin: 0 auto 20px;
       background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
+      border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 2px 10px rgba(0, 255, 255, 0.4);
       z-index: 100;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.6s ease; /* Smoother progress bar fade */
       padding: 2px;
     }
 
@@ -156,7 +157,7 @@
       height: 2px;
       background: rgba(0, 255, 255, 0.7);
       width: 0%;
-      transition: width 0.3s ease;
+      transition: width 0.4s ease; /* Smoother progress animation */
       box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
       margin-bottom: 2px;
     }
@@ -165,7 +166,7 @@
       height: 10px;
       background: #00ffff;
       width: 0%;
-      transition: width 0.3s ease;
+      transition: width 0.4s ease; /* Smoother progress animation */
       box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
     }
 
@@ -181,7 +182,7 @@
       flex-direction: column;
       transform: translateY(25px);
       opacity: 0;
-      transition: all 0.5s ease;
+      transition: all 0.6s ease; /* Smoother element transitions */
     }
 
     .question.show, .result-card.show, .schedule-card.show {
@@ -205,7 +206,7 @@
       font-size: 1.05rem;
       font-weight: 700;
       outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
       box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
     }
 
@@ -238,14 +239,14 @@
 
     .result-card, .schedule-card {
       background: rgba(0, 0, 0, 0.35);
-      border-radius: 18px;
+      border-radius: 25px;
       border: 2px solid #00ffff;
       padding: 20px;
       font-size: 1.1rem;
       line-height: 1.6;
       position: relative;
       box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.4s ease, box-shadow 0.4s ease; /* Smoother card transitions */
     }
 
     .result-card:hover, .schedule-card:hover {
@@ -255,7 +256,7 @@
 
     #scheduleCard {
       padding: 20px;
-      border-radius: 16px;
+      border-radius: 20px;
       background: rgba(0, 0, 0, 0.3);
       border: 3px solid #00ffff;
       box-shadow: 0 10px 30px rgba(0, 255, 255, 0.6), inset 0 0 25px rgba(0, 255, 255, 0.25);
@@ -287,10 +288,10 @@
       max-width: 420px;
       margin: 8px 0;
       padding: 10px 14px;
-      border-radius: 12px;
+      border-radius: 15px;
       background: linear-gradient(135deg, rgba(0, 255, 255, 0.25), rgba(106, 17, 203, 0.25));
       box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
-      transition: transform 0.2s ease;
+      transition: transform 0.3s ease;
     }
 
     #scheduleCard .schedule-line:hover {
@@ -321,7 +322,7 @@
       border-radius: 4px;
       margin-top: 8px;
       cursor: pointer;
-      transition: background 0.2s ease, box-shadow 0.2s ease;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
       box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
       position: relative;
     }
@@ -348,9 +349,14 @@
       cursor: not-allowed;
     }
 
-    .download-btn, .restart-btn {
+    .button-container {
+      display: flex;
+      gap: 20px; /* Provides excellent spacing between download and restart buttons */
       margin-top: 20px;
       align-self: center;
+    }
+
+    .download-btn, .restart-btn {
       background: linear-gradient(135deg, #00ccff, #9d4edd);
       border: none;
       border-radius: 50%;
@@ -362,7 +368,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease; /* Smoother button transitions */
       box-shadow: 0 6px 15px rgba(0, 255, 255, 0.5);
       position: relative;
       overflow: hidden;
@@ -402,10 +408,6 @@
       transform: translateY(1px);
     }
 
-    .restart-btn {
-      margin-top: 10px;
-    }
-
     .question-label {
       text-align: right;
       margin-bottom: 8px;
@@ -414,6 +416,27 @@
       color: #00ffff;
       opacity: 0.95;
       text-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
+    }
+
+    .hydration-total {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid #00ffff;
+      border-radius: 12px;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #00ffff;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 255, 255, 0.5);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hydration-total.show {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .congrats-message {
@@ -434,7 +457,7 @@
       font-size: 1.2rem;
       box-shadow: 0 10px 30px rgba(0, 255, 255, 0.6);
       opacity: 0;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      transition: opacity 0.6s ease, transform 0.6s ease; /* Smoother message transition */
       z-index: 1000;
     }
 
@@ -443,20 +466,53 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
+    @media (max-width: 768px) {
+      .container {
+        max-width: 90%;
+        padding: 20px;
+      }
+      #splashCard {
+        width: 70vw;
+        height: 70vw;
+        max-width: 400px;
+        max-height: 400px;
+      }
+      #startButton {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+      }
+      .progress-bar-container {
+        max-width: 95%;
+      }
+      .question, .result-card, .schedule-card {
+        font-size: 1rem;
+      }
+      .input-container input, .input-container select {
+        font-size: 1rem;
+        padding: 12px 10px;
+      }
+      .hydration-total {
+        font-size: 1rem;
+        padding: 8px 12px;
+      }
+    }
+
     @media (max-width: 480px) {
       body {
         align-items: center;
         overflow-y: auto;
         touch-action: pan-y;
       }
-      .container { 
-        height: auto; 
-        min-height: auto; 
-        padding: 15px; 
-        transform: translateY(0); 
+      .container {
+        height: auto;
+        min-height: auto;
+        padding: 15px;
+        transform: translateY(0);
         margin-bottom: 200px;
       }
-      .container:hover { transform: translateY(-5px); }
+      .container:hover {
+        transform: translateY(-5px);
+      }
       .inner-container {
         padding: 15px 0;
         overflow-y: visible;
@@ -465,22 +521,32 @@
       .progress-bar-container {
         max-width: 90%;
       }
-      .question, .result-card, .schedule-card { font-size: 0.95rem; }
-      .input-container input, .input-container select { 
-        font-size: 0.95rem; 
-        padding: 10px 8px; 
+      .question, .result-card, .schedule-card {
+        font-size: 0.95rem;
       }
-      .download-btn, .restart-btn { 
+      .input-container input, .input-container select {
+        font-size: 0.95rem;
+        padding: 10px 8px;
+      }
+      .download-btn, .restart-btn {
         width: 48px;
-        height: 48px; 
-        font-size: 20px; 
+        height: 48px;
+        font-size: 20px;
       }
       .download-btn i, .restart-btn i {
         font-size: 1.2rem;
       }
-      .question-label { font-size: 1.05rem; }
-      #scheduleCard { font-size: 0.9rem; min-width: 220px; width: 95%; }
-      #scheduleCard .schedule-line .time-ml span { font-size: 0.95rem; }
+      .question-label {
+        font-size: 1.05rem;
+      }
+      #scheduleCard {
+        font-size: 0.9rem;
+        min-width: 220px;
+        width: 95%;
+      }
+      #scheduleCard .schedule-line .time-ml span {
+        font-size: 0.95rem;
+      }
       #scheduleCard .schedule-line input[type="checkbox"] {
         width: 20px;
         height: 20px;
@@ -488,12 +554,27 @@
       #scheduleCard .schedule-line input[type="checkbox"]:checked::after {
         font-size: 14px;
       }
-      #splashCard { width: 80vw; height: 80vw; max-width: 300px; max-height: 300px; }
-      #startButton { padding: 10px 20px; font-size: 1rem; }
+      #splashCard {
+        width: 80vw;
+        height: 80vw;
+        max-width: 300px;
+        max-height: 300px;
+      }
+      #startButton {
+        padding: 10px 20px;
+        font-size: 1rem;
+      }
       .congrats-message {
         width: 90%;
         font-size: 1rem;
         padding: 15px;
+      }
+      .button-container {
+        gap: 15px; /* Slightly reduced gap for smaller screens while maintaining excellent spacing */
+      }
+      .hydration-total {
+        font-size: 0.9rem;
+        padding: 8px 10px;
       }
     }
   </style>
@@ -536,6 +617,20 @@
       return timeDate <= now;
     }
 
+    // Function to show a single message and remove any existing messages
+    function showSingleMessage(text, duration = 5000) {
+      document.querySelectorAll('.congrats-message').forEach(msg => msg.remove());
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('congrats-message');
+      messageDiv.innerHTML = text;
+      document.body.appendChild(messageDiv);
+      setTimeout(() => messageDiv.classList.add('show'), 50);
+      setTimeout(() => {
+        messageDiv.classList.remove('show');
+        messageDiv.addEventListener('transitionend', () => messageDiv.remove(), { once: true });
+      }, duration);
+    }
+
     const questions = [
       { text: "الوزن (كجم)", type: "number", min: 10, max: 300, required: true },
       { text: "مستوى النشاط اليومي", type: "select", options: ["عالي", "متوسط", "منخفض"], required: true },
@@ -555,6 +650,7 @@
     let answers = JSON.parse(localStorage.getItem('hydrationAnswers')) || [];
     let lastAnsweredIndex = parseInt(localStorage.getItem('lastAnsweredIndex')) || -1;
     let completedTimes = JSON.parse(localStorage.getItem('completedTimes')) || [];
+    let isPageRefresh = false;
 
     const audioFiles = {
       splash: new Audio('welcome.mp3'),
@@ -578,6 +674,7 @@
       answers = [];
       lastAnsweredIndex = -1;
       completedTimes = [];
+      isPageRefresh = false;
       container.innerHTML = '<div class="progress-bar-container" id="progressBarContainer"><div class="progress-aqua-line" id="progressAquaLine"></div><div class="progress-bar" id="progressBar"></div></div>';
       document.querySelector('.container').classList.remove('show');
       const splash = document.createElement('div');
@@ -598,28 +695,29 @@
     function startApp() {
       playAudio(audioFiles.splash);
       const splash = document.getElementById('splash');
-      setTimeout(() => {
-        splash.classList.add('hide');
-        splash.addEventListener('transitionend', () => {
-          splash.remove();
-          document.querySelector('.container').classList.add('show');
-          for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
-            const q = createQuestionElement(questions[i], i);
-            container.appendChild(q);
-            q.querySelector('input,select').value = answers[i] || '';
-            setTimeout(() => q.classList.add('show'), 50);
-          }
-          if (lastAnsweredIndex < questions.length - 1) {
-            const nextIndex = lastAnsweredIndex + 1;
-            const nextQ = createQuestionElement(questions[nextIndex], nextIndex);
-            container.appendChild(nextQ);
-            setTimeout(() => nextQ.classList.add('show'), 50);
-            nextQ.querySelector('input,select').focus();
-          }
-          updateProgressBar();
-          setTimeout(() => playAudio(audioFiles.welcome), 1000);
-        }, { once: true });
-      }, 2000);
+      splash.classList.add('hide');
+      splash.addEventListener('transitionend', () => {
+        splash.remove();
+        document.querySelector('.container').classList.add('show');
+        container.innerHTML = '<div class="progress-bar-container" id="progressBarContainer"><div class="progress-aqua-line" id="progressAquaLine"></div><div class="progress-bar" id="progressBar"></div></div>';
+        for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
+          const q = createQuestionElement(questions[i], i);
+          container.appendChild(q);
+          q.querySelector('input,select').value = answers[i] || '';
+          setTimeout(() => q.classList.add('show'), 50);
+        }
+        if (lastAnsweredIndex < questions.length - 1) {
+          const nextIndex = lastAnsweredIndex + 1;
+          const nextQ = createQuestionElement(questions[nextIndex], nextIndex);
+          container.appendChild(nextQ);
+          setTimeout(() => nextQ.classList.add('show'), 50);
+          nextQ.querySelector('input,select').focus();
+        } else {
+          showResult();
+        }
+        updateProgressBar();
+        setTimeout(() => playAudio(audioFiles.welcome), 1000);
+      }, { once: true });
     }
 
     window.addEventListener('load', () => {
@@ -629,21 +727,10 @@
       const mainContainer = document.querySelector('.container');
 
       if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length) {
+        isPageRefresh = true;
         splash.classList.add('hide');
         mainContainer.classList.add('show');
         showResult();
-        // Show follow-up message on page refresh
-        setTimeout(() => {
-          const followUpMessage = document.createElement('div');
-          followUpMessage.classList.add('congrats-message');
-          followUpMessage.innerHTML = 'لمتابعة روتينك بشكل أفضل ابق متصلاً بالموقع';
-          document.body.appendChild(followUpMessage);
-          setTimeout(() => followUpMessage.classList.add('show'), 50);
-          setTimeout(() => {
-            followUpMessage.classList.remove('show');
-            followUpMessage.addEventListener('transitionend', () => followUpMessage.remove(), { once: true });
-          }, 5000);
-        }, 1000);
         return;
       }
 
@@ -951,7 +1038,21 @@
       return schedule;
     }
 
+    function checkAllCheckboxes() {
+      const checkboxes = document.querySelectorAll('#scheduleCard input[type="checkbox"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      if (allChecked) {
+        showSingleMessage('تهانينا! لقد أكملت جدول الترطيب. سيتم إعادة تشغيل التطبيق.');
+        setTimeout(() => {
+          resetApp();
+        }, 2000);
+      }
+    }
+
     function showResult() {
+      // Clear all questions and previous content except progress bar
+      container.querySelectorAll('.question, .result-card').forEach(elem => elem.remove());
+
       let user = {};
       questions.forEach((q, i) => { user[i] = answers[i]; });
 
@@ -966,15 +1067,15 @@
       base = Math.max(1.5, Math.min(base, 5.0));
       base = Math.round(base * 100) / 100;
 
-      const div = document.createElement('div');
-      div.classList.add('result-card');
-      div.innerHTML = `<strong>💧 الترطيب اليومي المقدر:</strong> ${base} لتر/يوم`;
-      container.appendChild(div);
-      setTimeout(() => div.classList.add('show'), 50);
-      div.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
       const total_ml = base * 1000;
       const schedule = generateWaterDistribution(total_ml, user);
+
+      // Create hydration total display
+      const hydrationTotal = document.createElement('div');
+      hydrationTotal.classList.add('hydration-total');
+      hydrationTotal.textContent = `الترطيب اليومي المقدر: ${base.toFixed(2)} لتر`;
+      container.appendChild(hydrationTotal);
+      setTimeout(() => hydrationTotal.classList.add('show'), 50);
 
       let scheduleDiv = document.createElement('div');
       scheduleDiv.classList.add('schedule-card');
@@ -993,24 +1094,20 @@
         checkbox.checked = isChecked;
         checkbox.disabled = !isTimeBeforeNow(time24) && !isChecked;
         checkbox.addEventListener('change', (e) => {
-          if (!isTimeBeforeNow(time24) && !checkbox.checked) {
-            e.preventDefault();
-            checkbox.checked = false;
-            alert("⚠️ لا يمكن وضع علامة على موعد لم يحن بعد.");
-            return;
-          }
           if (checkbox.checked && !completedTimes.includes(time24)) {
             completedTimes.push(time24);
             localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
             playAudio(audioFiles.check);
-          } else if (!checkbox.checked) {
-            completedTimes = completedTimes.filter(t => t !== time24);
-            localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
+            checkbox.disabled = true; // Disable checkbox after checking
+            checkAllCheckboxes();
           }
         });
         line.appendChild(checkbox);
         scheduleDiv.appendChild(line);
       });
+
+      const buttonContainer = document.createElement('div');
+      buttonContainer.classList.add('button-container');
 
       const downloadBtn = document.createElement("button");
       downloadBtn.classList.add("download-btn");
@@ -1023,10 +1120,9 @@
           downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
           const clone = scheduleDiv.cloneNode(true);
-          const btnInClone = clone.querySelector('.download-btn');
-          if (btnInClone) btnInClone.remove();
-          const restartBtnInClone = clone.querySelector('.restart-btn');
-          if (restartBtnInClone) restartBtnInClone.remove();
+          const hydrationClone = hydrationTotal.cloneNode(true);
+          const btnContainerInClone = clone.querySelector('.button-container');
+          if (btnContainerInClone) btnContainerInClone.remove();
           const checkboxes = clone.querySelectorAll('input[type="checkbox"]');
           checkboxes.forEach(cb => cb.remove());
 
@@ -1038,33 +1134,50 @@
           const linePadding = isMobile ? 8 : 10;
           const lineMargin = isMobile ? 8 : 10;
 
-          clone.style.position = 'absolute';
-          clone.style.left = '-99999px';
-          clone.style.top = '0';
-          clone.style.width = `${baseWidth}px`;
-          clone.style.height = 'auto';
-          clone.style.minHeight = 'fit-content';
-          clone.style.background = '#000000';
-          clone.style.border = '3px solid #00ffff';
-          clone.style.color = '#00ffff';
-          clone.style.fontFamily = '"Almarai", "Noto Naskh Arabic", Arial, sans-serif';
-          clone.style.fontWeight = '900';
-          clone.style.direction = 'rtl';
-          clone.style.textAlign = 'center';
-          clone.style.letterSpacing = '0.5px';
-          clone.style.wordSpacing = 'normal';
-          clone.style.unicodeBidi = 'embed';
-          clone.style.textRendering = 'optimizeLegibility';
-          clone.style.webkitFontSmoothing = 'antialiased';
-          clone.style.mozOsxFontSmoothing = 'grayscale';
-          clone.style.fontKerning = 'normal';
-          clone.style.padding = `${padding}px`;
-          clone.style.borderRadius = '16px';
-          clone.style.boxShadow = '0 10px 30px rgba(0, 255, 255, 0.6)';
-          clone.style.margin = '0 auto';
-          clone.style.display = 'flex';
-          clone.style.flexDirection = 'column';
-          clone.style.alignItems = 'center';
+          // Style the hydration total for the snapshot
+          hydrationClone.style.background = 'rgba(0, 0, 0, 0.4)';
+          hydrationClone.style.border = '2px solid #00ffff';
+          hydrationClone.style.borderRadius = '12px';
+          hydrationClone.style.padding = `${isMobile ? 8 : 10}px ${isMobile ? 12 : 15}px`;
+          hydrationClone.style.marginBottom = '15px';
+          hydrationClone.style.fontSize = `${isMobile ? 0.9 : 1.1}rem`;
+          hydrationClone.style.fontWeight = '900';
+          hydrationClone.style.color = '#00ffff';
+          hydrationClone.style.textAlign = 'center';
+          hydrationClone.style.boxShadow = '0 4px 15px rgba(0, 255, 255, 0.5)';
+          hydrationClone.style.opacity = '1';
+
+          const wrapper = document.createElement('div');
+          wrapper.appendChild(hydrationClone);
+          wrapper.appendChild(clone);
+
+          wrapper.style.position = 'absolute';
+          wrapper.style.left = '-99999px';
+          wrapper.style.top = '0';
+          wrapper.style.width = `${baseWidth}px`;
+          wrapper.style.height = 'auto';
+          wrapper.style.minHeight = 'fit-content';
+          wrapper.style.background = '#000000';
+          wrapper.style.border = '3px solid #00ffff';
+          wrapper.style.color = '#00ffff';
+          wrapper.style.fontFamily = '"Almarai", "Noto Naskh Arabic", Arial, sans-serif';
+          wrapper.style.fontWeight = '900';
+          wrapper.style.direction = 'rtl';
+          wrapper.style.textAlign = 'center';
+          wrapper.style.letterSpacing = '0.5px';
+          wrapper.style.wordSpacing = 'normal';
+          wrapper.style.unicodeBidi = 'embed';
+          wrapper.style.textRendering = 'optimizeLegibility';
+          wrapper.style.webkitFontSmoothing = 'antialiased';
+          wrapper.style.mozOsxFontSmoothing = 'grayscale';
+          wrapper.style.fontKerning = 'normal';
+          wrapper.style.padding = `${padding}px`;
+          wrapper.style.borderRadius = '16px';
+          wrapper.style.boxShadow = '0 10px 30px rgba(0, 255, 255, 0.6)';
+          wrapper.style.margin = '0 auto';
+          wrapper.style.display = 'flex';
+          wrapper.style.flexDirection = 'column';
+          wrapper.style.alignItems = 'center';
 
           const title = clone.querySelector('strong');
           if (title) {
@@ -1110,8 +1223,8 @@
             });
           });
 
-          document.body.appendChild(clone);
-          clone.offsetHeight;
+          document.body.appendChild(wrapper);
+          wrapper.offsetHeight;
           await document.fonts.load(`900 ${fontSize}px Almarai`);
           await document.fonts.load(`900 ${fontSize}px "Noto Naskh Arabic"`);
           await document.fonts.ready;
@@ -1119,8 +1232,8 @@
 
           const pixelRatio = window.devicePixelRatio || 1;
           const scale = isMobile ? 4 : 3;
-          const canvasWidth = Math.round(clone.getBoundingClientRect().width * scale);
-          const canvasHeight = Math.round(clone.getBoundingClientRect().height * scale);
+          const canvasWidth = Math.round(wrapper.getBoundingClientRect().width * scale);
+          const canvasHeight = Math.round(wrapper.getBoundingClientRect().height * scale);
           const opts = {
             scale: scale,
             useCORS: true,
@@ -1129,12 +1242,12 @@
             logging: false,
             width: canvasWidth / scale,
             height: canvasHeight / scale,
-            windowWidth: clone.scrollWidth,
-            windowHeight: clone.scrollHeight
+            windowWidth: wrapper.scrollWidth,
+            windowHeight: wrapper.scrollHeight
           };
 
-          const canvas = await html2canvas(clone, opts);
-          clone.remove();
+          const canvas = await html2canvas(wrapper, opts);
+          wrapper.remove();
 
           canvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
@@ -1168,6 +1281,7 @@
       restartBtn.classList.add("restart-btn");
       restartBtn.setAttribute("title", "إعادة تشغيل التطبيق");
       restartBtn.innerHTML = '<i class="fas fa-redo"></i>';
+
       restartBtn.addEventListener("click", () => {
         restartBtn.classList.add("busy");
         restartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -1178,25 +1292,17 @@
         }, 1000);
       });
 
-      scheduleDiv.appendChild(downloadBtn);
-      scheduleDiv.appendChild(restartBtn);
+      buttonContainer.appendChild(downloadBtn);
+      buttonContainer.appendChild(restartBtn);
+      scheduleDiv.appendChild(buttonContainer);
       container.appendChild(scheduleDiv);
       setTimeout(() => {
         scheduleDiv.classList.add('show');
         hideProgressBar();
         setTimeout(() => playAudio(audioFiles.program), 1000);
-        // Show congratulatory message after 1 second
-        setTimeout(() => {
-          const congratsDiv = document.createElement('div');
-          congratsDiv.classList.add('congrats-message');
-          congratsDiv.innerHTML = 'تهانينا قم بتحديث الصفحة';
-          document.body.appendChild(congratsDiv);
-          setTimeout(() => congratsDiv.classList.add('show'), 50);
-          setTimeout(() => {
-            congratsDiv.classList.remove('show');
-            congratsDiv.addEventListener('transitionend', () => congratsDiv.remove(), { once: true });
-          }, 5000);
-        }, 1000);
+        if (!isPageRefresh) {
+          showSingleMessage('تهانينا! لمتابعة روتينك بشكل أفضل ابق متصلاً بالموقع');
+        }
       }, 50);
       scheduleDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
