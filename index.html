@@ -643,8 +643,11 @@
             splash.remove();
             document.querySelector('.container').classList.add('show');
             if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length) {
-              showResult();
+              // If all questions are answered, show the result and schedule directly
+              playAudio(audioFiles.processing);
+              setTimeout(showResult, 2000);
             } else {
+              // Otherwise, show questions as before
               for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
                 const q = createQuestionElement(questions[i], i);
                 container.appendChild(q);
