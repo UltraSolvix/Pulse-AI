@@ -153,20 +153,20 @@
     }
 
     .progress-aqua-line {
-      height: 2px;
+      height: 1px;
       background: rgba(0, 255, 255, 0.7);
       width: 0%;
       transition: width 0.3s ease;
-      box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
-      margin-bottom: 2px;
+      box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+      margin-bottom: 1px;
     }
 
     .progress-bar {
-      height: 10px;
+      height: 3px;
       background: #00ffff;
       width: 0%;
       transition: width 0.3s ease;
-      box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+      box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
     }
 
     .progress-bar-container.hidden {
@@ -1102,19 +1102,25 @@
           checkbox.disabled = !isTimeBeforeNow(time24) && !isChecked;
           checkbox.addEventListener('change', (e) => {
             try {
-              if (!isTimeBeforeNow(time24) && !checkbox.checked) {
+              // Prevent unchecking if already checked
+              if (isChecked) {
+                e.preventDefault();
+                checkbox.checked = true;
+                alert("⚠️ لا يمكن إزالة العلامة بعد تأكيدها.");
+                return;
+              }
+              // Prevent checking if time is in the future
+              if (!isTimeBeforeNow(time24)) {
                 e.preventDefault();
                 checkbox.checked = false;
                 alert("⚠️ لا يمكن وضع علامة على موعد لم يحن بعد.");
                 return;
               }
+              // Handle checking
               if (checkbox.checked && !completedTimes.includes(time24)) {
                 completedTimes.push(time24);
                 localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
                 playAudio(audioFiles.check);
-              } else if (!checkbox.checked) {
-                completedTimes = completedTimes.filter(t => t !== time24);
-                localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
               }
             } catch (err) {
               console.error('Error handling checkbox change:', err);
