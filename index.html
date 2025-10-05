@@ -293,7 +293,7 @@
       transition: transform 0.2s ease;
     }
 
-    #scheduleCard .schedule-lineerrit:hover {
+    #scheduleCard .schedule-line:hover {
       transform: scale(1.03);
     }
 
@@ -676,10 +676,12 @@
           splash.addEventListener('transitionend', () => {
             splash.remove();
             document.querySelector('.container').classList.add('show');
-            if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length) {
+            // Check if questionnaire is complete
+            if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length && answers.every((ans, idx) => validateInput(ans, questions[idx]))) {
               playAudio(audioFiles.processing);
               setTimeout(showResult, 2000);
             } else {
+              // Show questions up to the last answered one, plus the next unanswered question
               for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
                 const q = createQuestionElement(questions[i], i);
                 container.appendChild(q);
@@ -1360,6 +1362,18 @@
         alert('حدث خطأ أثناء عرض النتائج. حاول مرة أخرى.');
       }
     }
+
+    // Save state before unloading
+    window.addEventListener('beforeunload', () => {
+      try {
+        localStorage.setItem('hydrationAnswers', JSON.stringify(answers));
+        localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
+        localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
+        localStorage.setItem('lastDate', new Date().toISOString().split('T')[0]);
+      } catch (err) {
+        console.error('Error saving state before unload:', err);
+      }
+    });
   </script>
 </body>
 </html>
