@@ -293,7 +293,7 @@
       transition: transform 0.2s ease;
     }
 
-    #scheduleCard .schedule-line:hover {
+    #scheduleCard .schedule-lineerrit:hover {
       transform: scale(1.03);
     }
 
@@ -416,6 +416,33 @@
       text-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
     }
 
+    #successMessage {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border: 2px solid #00ffff;
+      border-radius: 20px;
+      padding: 20px 30px;
+      color: #00ffff;
+      font-size: 1.2rem;
+      font-weight: 900;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 255, 255, 0.6);
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 10000;
+      max-width: 90%;
+      pointer-events: none;
+    }
+
+    #successMessage.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
     @media (max-width: 480px) {
       body {
         align-items: center;
@@ -463,6 +490,11 @@
       }
       #splashCard { width: 80vw; height: 80vw; max-width: 300px; max-height: 300px; }
       #startButton { padding: 10px 20px; font-size: 1rem; }
+      #successMessage {
+        font-size: 1rem;
+        padding: 15px 20px;
+        max-width: 80%;
+      }
     }
   </style>
 </head>
@@ -482,6 +514,8 @@
       </div>
     </div>
   </div>
+
+  <div id="successMessage">🎉 تهانينا! لمتابعة تقدمك، قم بتحديث الصفحة</div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
   <script>
@@ -643,11 +677,9 @@
             splash.remove();
             document.querySelector('.container').classList.add('show');
             if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length) {
-              // If all questions are answered, show the result and schedule directly
               playAudio(audioFiles.processing);
               setTimeout(showResult, 2000);
             } else {
-              // Otherwise, show questions as before
               for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
                 const q = createQuestionElement(questions[i], i);
                 container.appendChild(q);
@@ -686,7 +718,7 @@
         const startButton = document.getElementById('startButton');
         const mainContainer = document.querySelector('.container');
 
-        if (!splash || !splashCard || !startButton || !mainContainer) {
+        if (!mainContainer || !splash || !splashCard || !startButton) {
           console.error('Required DOM elements missing.');
           return;
         }
@@ -694,7 +726,6 @@
         setTimeout(() => {
           splashCard.classList.add('show');
         }, 100);
-
         startButton.addEventListener('click', startApp);
       } catch (err) {
         console.error('Error on page load:', err);
@@ -1314,6 +1345,14 @@
           scheduleDiv.classList.add('show');
           hideProgressBar();
           setTimeout(() => playAudio(audioFiles.program), 1000);
+          // Show success message
+          const successMessage = document.getElementById('successMessage');
+          if (successMessage) {
+            successMessage.classList.add('show');
+            setTimeout(() => {
+              successMessage.classList.remove('show');
+            }, 5000);
+          }
         }, 50);
         scheduleDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
       } catch (err) {
