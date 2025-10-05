@@ -153,20 +153,20 @@
     }
 
     .progress-aqua-line {
-      height: 1px;
+      height: 2px;
       background: rgba(0, 255, 255, 0.7);
       width: 0%;
       transition: width 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-      margin-bottom: 1px;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+      margin-bottom: 2px;
     }
 
     .progress-bar {
-      height: 3px;
+      height: 10px;
       background: #00ffff;
       width: 0%;
       transition: width 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
     }
 
     .progress-bar-container.hidden {
@@ -238,7 +238,7 @@
 
     .result-card, .schedule-card {
       background: rgba(0, 0, 0, 0.35);
-      border-radius: 30px;
+      border-radius: 18px;
       border: 2px solid #00ffff;
       padding: 20px;
       font-size: 1.1rem;
@@ -255,7 +255,7 @@
 
     #scheduleCard {
       padding: 20px;
-      border-radius: 30px;
+      border-radius: 16px;
       background: rgba(0, 0, 0, 0.3);
       border: 3px solid #00ffff;
       box-shadow: 0 10px 30px rgba(0, 255, 255, 0.6), inset 0 0 25px rgba(0, 255, 255, 0.25);
@@ -287,7 +287,7 @@
       max-width: 420px;
       margin: 8px 0;
       padding: 10px 14px;
-      border-radius: 20px;
+      border-radius: 12px;
       background: linear-gradient(135deg, rgba(0, 255, 255, 0.25), rgba(106, 17, 203, 0.25));
       box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
       transition: transform 0.2s ease;
@@ -416,29 +416,29 @@
       text-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
     }
 
-    #successMessage {
+    .congrats-message {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(0, 204, 255, 0.8), rgba(157, 78, 221, 0.8));
       border: 2px solid #00ffff;
-      border-radius: 20px;
-      padding: 20px 30px;
-      color: #00ffff;
-      font-size: 1.2rem;
-      font-weight: 900;
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 90%;
+      width: 400px;
       text-align: center;
-      box-shadow: 0 8px 20px rgba(0, 255, 255, 0.6);
+      color: #fff;
+      font-family: 'Almarai', "Noto Naskh Arabic", Arial, sans-serif;
+      font-weight: 900;
+      font-size: 1.2rem;
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.6);
       opacity: 0;
       transition: opacity 0.5s ease, transform 0.5s ease;
-      z-index: 10000;
-      max-width: 90%;
-      pointer-events: none;
+      z-index: 1000;
     }
 
-    #successMessage.show {
+    .congrats-message.show {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
@@ -490,10 +490,10 @@
       }
       #splashCard { width: 80vw; height: 80vw; max-width: 300px; max-height: 300px; }
       #startButton { padding: 10px 20px; font-size: 1rem; }
-      #successMessage {
+      .congrats-message {
+        width: 90%;
         font-size: 1rem;
-        padding: 15px 20px;
-        max-width: 80%;
+        padding: 15px;
       }
     }
   </style>
@@ -515,13 +515,11 @@
     </div>
   </div>
 
-  <div id="successMessage">🎉 تهانينا! لمتابعة تقدمك، قم بتحديث الصفحة</div>
-
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
   <script>
     // Function to convert 24-hour time to 12-hour format with AM/PM
     function to12HourFormat(timeStr) {
-      if (!timeStr || !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeStr)) return timeStr || '';
+      if (!timeStr || !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeStr)) return timeStr;
       let [hours, minutes] = timeStr.split(':').map(Number);
       const period = hours >= 12 ? 'PM' : 'AM';
       hours = hours % 12 || 12;
@@ -554,9 +552,9 @@
     ];
 
     const container = document.getElementById('questionContainer');
-    let answers = [];
-    let lastAnsweredIndex = -1;
-    let completedTimes = [];
+    let answers = JSON.parse(localStorage.getItem('hydrationAnswers')) || [];
+    let lastAnsweredIndex = parseInt(localStorage.getItem('lastAnsweredIndex')) || -1;
+    let completedTimes = JSON.parse(localStorage.getItem('completedTimes')) || [];
 
     const audioFiles = {
       splash: new Audio('welcome.mp3'),
@@ -568,302 +566,184 @@
     };
 
     function playAudio(audio) {
-      if (audio) {
-        audio.volume = 1.0;
-        audio.play().catch(err => console.error('Audio play error:', err));
-      }
-    }
-
-    function loadStoredData() {
-      try {
-        const storedAnswers = localStorage.getItem('hydrationAnswers');
-        const storedIndex = localStorage.getItem('lastAnsweredIndex');
-        const storedTimes = localStorage.getItem('completedTimes');
-        const storedDate = localStorage.getItem('lastDate');
-        const today = new Date().toISOString().split('T')[0];
-
-        if (storedDate !== today) {
-          localStorage.removeItem('hydrationAnswers');
-          localStorage.removeItem('lastAnsweredIndex');
-          localStorage.removeItem('completedTimes');
-          localStorage.setItem('lastDate', today);
-          return { answers: [], lastAnsweredIndex: -1, completedTimes: [] };
-        }
-
-        answers = storedAnswers ? JSON.parse(storedAnswers) : [];
-        lastAnsweredIndex = storedIndex ? parseInt(storedIndex, 10) : -1;
-        completedTimes = storedTimes ? JSON.parse(storedTimes) : [];
-
-        // Validate stored answers
-        if (!Array.isArray(answers) || answers.length > questions.length) {
-          console.warn('Invalid answers in localStorage, resetting.');
-          answers = [];
-          lastAnsweredIndex = -1;
-          completedTimes = [];
-          localStorage.setItem('hydrationAnswers', JSON.stringify(answers));
-          localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
-          localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
-        }
-
-        // Validate completed times
-        if (!Array.isArray(completedTimes)) {
-          console.warn('Invalid completedTimes in localStorage, resetting.');
-          completedTimes = [];
-          localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
-        }
-
-        // Ensure all answers are valid
-        answers.forEach((answer, idx) => {
-          if (!validateInput(answer, questions[idx])) {
-            console.warn(`Invalid answer at index ${idx}, resetting.`);
-            answers[idx] = undefined;
-            if (idx <= lastAnsweredIndex) lastAnsweredIndex = idx - 1;
-          }
-        });
-
-        localStorage.setItem('hydrationAnswers', JSON.stringify(answers));
-        localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
-        localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
-
-        return { answers, lastAnsweredIndex, completedTimes };
-      } catch (err) {
-        console.error('Error loading stored data:', err);
-        localStorage.removeItem('hydrationAnswers');
-        localStorage.removeItem('lastAnsweredIndex');
-        localStorage.removeItem('completedTimes');
-        localStorage.setItem('lastDate', new Date().toISOString().split('T')[0]);
-        return { answers: [], lastAnsweredIndex: -1, completedTimes: [] };
-      }
+      audio.volume = 1.0;
+      audio.play().catch(err => console.error('Audio play error:', err));
     }
 
     function resetApp() {
-      try {
-        localStorage.removeItem('hydrationAnswers');
-        localStorage.removeItem('lastAnsweredIndex');
-        localStorage.removeItem('completedTimes');
-        localStorage.removeItem('lastDate');
-        answers = [];
-        lastAnsweredIndex = -1;
-        completedTimes = [];
-        container.innerHTML = '<div class="progress-bar-container" id="progressBarContainer"><div class="progress-aqua-line" id="progressAquaLine"></div><div class="progress-bar" id="progressBar"></div></div>';
-        document.querySelector('.container').classList.remove('show');
-        const splash = document.createElement('div');
-        splash.id = 'splash';
-        splash.innerHTML = `
-          <div id="splashCard">
-            <img src="A_hyperrealistic_image_of_a_stunning_space_galaxy_background_with_integrated_black_and_vibrant_purpl (2).png" alt="Hydration Pro Logo">
-          </div>
-          <button id="startButton">ابدأ</button>
-        `;
-        document.body.appendChild(splash);
-        setTimeout(() => {
-          const splashCard = document.getElementById('splashCard');
-          const startButton = document.getElementById('startButton');
-          if (splashCard) splashCard.classList.add('show');
-          if (startButton) startButton.addEventListener('click', startApp);
-        }, 100);
-      } catch (err) {
-        console.error('Error resetting app:', err);
-        alert('حدث خطأ أثناء إعادة تشغيل التطبيق. حاول مرة أخرى.');
-      }
+      localStorage.removeItem('hydrationAnswers');
+      localStorage.removeItem('lastAnsweredIndex');
+      localStorage.removeItem('completedTimes');
+      localStorage.removeItem('lastDate');
+      answers = [];
+      lastAnsweredIndex = -1;
+      completedTimes = [];
+      container.innerHTML = '<div class="progress-bar-container" id="progressBarContainer"><div class="progress-aqua-line" id="progressAquaLine"></div><div class="progress-bar" id="progressBar"></div></div>';
+      document.querySelector('.container').classList.remove('show');
+      const splash = document.createElement('div');
+      splash.id = 'splash';
+      splash.innerHTML = `
+        <div id="splashCard">
+          <img src="A_hyperrealistic_image_of_a_stunning_space_galaxy_background_with_integrated_black_and_vibrant_purpl (2).png" alt="Hydration Pro Logo">
+        </div>
+        <button id="startButton">ابدأ</button>
+      `;
+      document.body.appendChild(splash);
+      setTimeout(() => {
+        document.getElementById('splashCard').classList.add('show');
+        document.getElementById('startButton').addEventListener('click', startApp);
+      }, 100);
     }
 
     function startApp() {
-      try {
-        playAudio(audioFiles.splash);
-        const splash = document.getElementById('splash');
-        if (!splash) return;
-
-        setTimeout(() => {
-          splash.classList.add('hide');
-          splash.addEventListener('transitionend', () => {
-            splash.remove();
-            document.querySelector('.container').classList.add('show');
-            // Check if questionnaire and schedule are complete
-            const schedule = generateWaterDistribution(calculateTotalWater(), answers);
-            const allTimesCompleted = schedule.every(([, , , time24]) => completedTimes.includes(time24));
-            if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length && answers.every((ans, idx) => validateInput(ans, questions[idx])) && allTimesCompleted) {
-              playAudio(audioFiles.program);
-              showResult();
-            } else if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length && answers.every((ans, idx) => validateInput(ans, questions[idx]))) {
-              playAudio(audioFiles.processing);
-              setTimeout(showResult, 2000);
-            } else {
-              // Show questions up to the last answered one, plus the next unanswered question
-              for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
-                const q = createQuestionElement(questions[i], i);
-                container.appendChild(q);
-                const input = q.querySelector('input,select');
-                if (input) input.value = answers[i] || '';
-                setTimeout(() => q.classList.add('show'), 50);
-              }
-              if (lastAnsweredIndex < questions.length - 1) {
-                const nextIndex = lastAnsweredIndex + 1;
-                const nextQ = createQuestionElement(questions[nextIndex], nextIndex);
-                container.appendChild(nextQ);
-                setTimeout(() => nextQ.classList.add('show'), 50);
-                const input = nextQ.querySelector('input,select');
-                if (input) input.focus();
-              }
-              updateProgressBar();
-              setTimeout(() => playAudio(audioFiles.welcome), 1000);
-            }
-          }, { once: true });
-        }, 2000);
-      } catch (err) {
-        console.error('Error starting app:', err);
-        alert('حدث خطأ أثناء بدء التطبيق. حاول مرة أخرى.');
-      }
+      playAudio(audioFiles.splash);
+      const splash = document.getElementById('splash');
+      setTimeout(() => {
+        splash.classList.add('hide');
+        splash.addEventListener('transitionend', () => {
+          splash.remove();
+          document.querySelector('.container').classList.add('show');
+          for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
+            const q = createQuestionElement(questions[i], i);
+            container.appendChild(q);
+            q.querySelector('input,select').value = answers[i] || '';
+            setTimeout(() => q.classList.add('show'), 50);
+          }
+          if (lastAnsweredIndex < questions.length - 1) {
+            const nextIndex = lastAnsweredIndex + 1;
+            const nextQ = createQuestionElement(questions[nextIndex], nextIndex);
+            container.appendChild(nextQ);
+            setTimeout(() => nextQ.classList.add('show'), 50);
+            nextQ.querySelector('input,select').focus();
+          }
+          updateProgressBar();
+          setTimeout(() => playAudio(audioFiles.welcome), 1000);
+        }, { once: true });
+      }, 2000);
     }
 
     window.addEventListener('load', () => {
-      try {
-        const { answers: storedAnswers, lastAnsweredIndex: storedIndex, completedTimes: storedTimes } = loadStoredData();
-        answers = storedAnswers;
-        lastAnsweredIndex = storedIndex;
-        completedTimes = storedTimes;
+      const splash = document.getElementById('splash');
+      const splashCard = document.getElementById('splashCard');
+      const startButton = document.getElementById('startButton');
+      const mainContainer = document.querySelector('.container');
 
-        const splash = document.getElementById('splash');
-        const splashCard = document.getElementById('splashCard');
-        const startButton = document.getElementById('startButton');
-        const mainContainer = document.querySelector('.container');
-
-        if (!mainContainer || !splash || !splashCard || !startButton) {
-          console.error('Required DOM elements missing.');
-          return;
-        }
-
+      if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length) {
+        splash.classList.add('hide');
+        mainContainer.classList.add('show');
+        showResult();
+        // Show follow-up message on page refresh
         setTimeout(() => {
-          splashCard.classList.add('show');
-        }, 100);
-
-        // Check if questionnaire and schedule are complete
-        const schedule = generateWaterDistribution(calculateTotalWater(), answers);
-        const allTimesCompleted = schedule.every(([, , , time24]) => completedTimes.includes(time24));
-        if (lastAnsweredIndex >= questions.length - 1 && answers.length >= questions.length && answers.every((ans, idx) => validateInput(ans, questions[idx])) && allTimesCompleted) {
-          splash.classList.add('hide');
-          splash.addEventListener('transitionend', () => {
-            splash.remove();
-            mainContainer.classList.add('show');
-            playAudio(audioFiles.program);
-            showResult();
-          }, { once: true });
-        } else {
-          startButton.addEventListener('click', startApp);
-        }
-      } catch (err) {
-        console.error('Error on page load:', err);
-        alert('حدث خطأ أثناء تحميل الصفحة. حاول مرة أخرى.');
+          const followUpMessage = document.createElement('div');
+          followUpMessage.classList.add('congrats-message');
+          followUpMessage.innerHTML = 'لمتابعة روتينك بشكل أفضل ابق متصلاً بالموقع';
+          document.body.appendChild(followUpMessage);
+          setTimeout(() => followUpMessage.classList.add('show'), 50);
+          setTimeout(() => {
+            followUpMessage.classList.remove('show');
+            followUpMessage.addEventListener('transitionend', () => followUpMessage.remove(), { once: true });
+          }, 5000);
+        }, 1000);
+        return;
       }
+
+      setTimeout(() => {
+        splashCard.classList.add('show');
+      }, 100);
+
+      startButton.addEventListener('click', startApp);
     });
 
     function createQuestionElement(obj, index) {
-      try {
-        const div = document.createElement('div');
-        div.classList.add('question');
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('input-container');
+      const div = document.createElement('div');
+      div.classList.add('question');
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('input-container');
 
-        const label = document.createElement('span');
-        label.classList.add('question-label');
-        label.textContent = obj.text;
-        div.appendChild(label);
+      const label = document.createElement('span');
+      label.classList.add('question-label');
+      label.textContent = obj.text;
+      div.appendChild(label);
 
-        let input;
-        const isMobile = window.innerWidth <= 480;
-        if (obj.type === "select") {
-          input = document.createElement('select');
-          const placeholder = document.createElement('option');
-          placeholder.value = "";
-          placeholder.disabled = true;
-          placeholder.selected = true;
-          placeholder.textContent = obj.text;
-          placeholder.style.color = "rgba(0,255,255,0.65)";
-          input.appendChild(placeholder);
-          obj.options.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt;
-            option.textContent = opt;
-            input.appendChild(option);
-          });
-          input.addEventListener('change', handleSelect);
-        } else {
-          input = document.createElement('input');
-          input.type = obj.type === "time" ? "time" : obj.type;
-          input.placeholder = obj.placeholder || obj.text;
-          input.addEventListener('input', handleInput); // Changed to 'input' for mobile compatibility
-          input.addEventListener('change', handleInput); // Added for robustness
-          if (obj.default !== undefined && !answers[index]) input.value = obj.default;
-        }
-
-        input.required = true;
-        input.setAttribute('data-index', index);
-        input.addEventListener('focus', (e) => {
-          setTimeout(() => {
-            const rect = e.target.getBoundingClientRect();
-            const offset = rect.top + window.scrollY - 150;
-            window.scrollTo({ top: offset, behavior: 'smooth' });
-          }, 300);
+      let input;
+      const isMobile = window.innerWidth <= 480;
+      if (obj.type === "select") {
+        input = document.createElement('select');
+        const placeholder = document.createElement('option');
+        placeholder.value = "";
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        placeholder.textContent = obj.text;
+        placeholder.style.color = "rgba(0,255,255,0.65)";
+        input.appendChild(placeholder);
+        obj.options.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt;
+          input.appendChild(option);
         });
-        wrapper.appendChild(input);
-        div.appendChild(wrapper);
-        return div;
-      } catch (err) {
-        console.error('Error creating question element:', err);
-        return document.createElement('div');
+        input.addEventListener('change', handleSelect);
+      } else {
+        input = document.createElement('input');
+        input.type = obj.type === "time" ? "time" : obj.type;
+        input.placeholder = obj.placeholder || obj.text;
+        if (obj.type === "time") {
+          if (!isMobile) {
+            input.addEventListener('keypress', handleTimeEnter);
+          } else {
+            input.addEventListener('change', handleTimeChange);
+          }
+        } else {
+          input.addEventListener('keypress', handleEnter);
+        }
+        if (obj.default !== undefined && !answers[index]) input.value = obj.default;
       }
+
+      input.required = true;
+      input.setAttribute('data-index', index);
+      input.addEventListener('focus', (e) => {
+        setTimeout(() => {
+          const rect = e.target.getBoundingClientRect();
+          const offset = rect.top + window.scrollY - 150;
+          window.scrollTo({ top: offset, behavior: 'smooth' });
+        }, 300);
+      });
+      wrapper.appendChild(input);
+      div.appendChild(wrapper);
+      return div;
     }
 
     function validateInput(value, obj) {
-      try {
-        if (!value && value !== "0") return false;
-        if (obj.type === "number") {
-          const num = parseFloat(value);
-          if (isNaN(num)) return false;
-          if (obj.min !== undefined && num < obj.min) return false;
-          if (obj.max !== undefined && num > obj.max) return false;
-        }
-        if (obj.type === "select") return obj.options.includes(value);
-        if (obj.type === "time") return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value.trim());
-        return true;
-      } catch (err) {
-        console.error('Error validating input:', err);
-        return false;
+      if (!value) return false;
+      if (obj.type === "number") {
+        const num = parseFloat(value);
+        if (isNaN(num)) return false;
+        if (obj.min !== undefined && num < obj.min) return false;
+        if (obj.max !== undefined && num > obj.max) return false;
       }
+      if (obj.type === "select") return obj.options.includes(value);
+      if (obj.type === "time") return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value.trim());
+      return true;
     }
 
     function updateProgressBar() {
-      try {
-        const progressBar = document.getElementById('progressBar');
-        const progressAquaLine = document.getElementById('progressAquaLine');
-        if (!progressBar || !progressAquaLine) return;
-        const progress = ((lastAnsweredIndex + 1) / questions.length) * 100;
-        progressBar.style.width = `${progress}%`;
-        progressAquaLine.style.width = `${progress}%`;
-      } catch (err) {
-        console.error('Error updating progress bar:', err);
-      }
+      const progressBar = document.getElementById('progressBar');
+      const progressAquaLine = document.getElementById('progressAquaLine');
+      const progress = ((lastAnsweredIndex + 1) / questions.length) * 100;
+      progressBar.style.width = `${progress}%`;
+      progressAquaLine.style.width = `${progress}%`;
     }
 
     function hideProgressBar() {
-      try {
-        const progressBarContainer = document.getElementById('progressBarContainer');
-        if (progressBarContainer) progressBarContainer.classList.add('hidden');
-      } catch (err) {
-        console.error('Error hiding progress bar:', err);
-      }
+      const progressBarContainer = document.getElementById('progressBarContainer');
+      progressBarContainer.classList.add('hidden');
     }
 
-    function handleInput(e) {
-      try {
-        const idx = parseInt(e.target.getAttribute('data-index'), 10);
+    function handleEnter(e) {
+      if (e.key === 'Enter') {
+        const idx = parseInt(e.target.getAttribute('data-index'));
         const q = questions[idx];
-        const val = e.target.value.trim();
-        if (!val && q.required) {
-          alert("⚠️ هذا الحقل مطلوب. يرجى إدخال قيمة.");
-          e.target.focus();
-          return;
-        }
+        const val = e.target.value;
         if (!validateInput(val, q)) {
           alert("⚠️ إدخال غير صالح. يرجى إدخال قيمة صحيحة.");
           e.target.focus();
@@ -875,21 +755,53 @@
           lastAnsweredIndex = idx;
           localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
           updateProgressBar();
-          e.target.disabled = true; // Disable input after valid entry
           nextQuestion(idx);
         }
-      } catch (err) {
-        console.error('Error handling input:', err);
-        alert('حدث خطأ أثناء معالجة الإدخال. حاول مرة أخرى.');
       }
     }
 
     function handleSelect(e) {
-      try {
-        const idx = parseInt(e.target.getAttribute('data-index'), 10);
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      const val = e.target.value;
+      if (!validateInput(val, questions[idx])) {
+        alert("⚠️ إدخال غير صالح. يرجى اختيار قيمة.");
+        e.target.focus();
+        return;
+      }
+      answers[idx] = val;
+      localStorage.setItem('hydrationAnswers', JSON.stringify(answers));
+      if (idx >= lastAnsweredIndex) {
+        lastAnsweredIndex = idx;
+        localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
+        updateProgressBar();
+        nextQuestion(idx);
+      }
+    }
+
+    function handleTimeChange(e) {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      const val = e.target.value;
+      if (!validateInput(val, questions[idx])) {
+        alert("⚠️ إدخال غير صالح. يرجى إدخال وقت صحيح.");
+        e.target.focus();
+        return;
+      }
+      answers[idx] = val;
+      localStorage.setItem('hydrationAnswers', JSON.stringify(answers));
+      if (idx >= lastAnsweredIndex) {
+        lastAnsweredIndex = idx;
+        localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
+        updateProgressBar();
+        nextQuestion(idx);
+      }
+    }
+
+    function handleTimeEnter(e) {
+      if (e.key === 'Enter') {
+        const idx = parseInt(e.target.getAttribute('data-index'));
         const val = e.target.value;
         if (!validateInput(val, questions[idx])) {
-          alert("⚠️ إدخال غير صالح. يرجى اختيار قيمة.");
+          alert("⚠️ إدخال غير صالح. يرجى إدخال وقت صحيح.");
           e.target.focus();
           return;
         }
@@ -899,475 +811,408 @@
           lastAnsweredIndex = idx;
           localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
           updateProgressBar();
-          e.target.disabled = true; // Disable select after valid selection
           nextQuestion(idx);
         }
-      } catch (err) {
-        console.error('Error handling select:', err);
-        alert('حدث خطأ أثناء معالجة الاختيار. حاول مرة أخرى.');
       }
     }
 
     function nextQuestion(idx) {
-      try {
-        let nextIndex = idx + 1;
-        if (nextIndex < questions.length) {
-          const nextElem = createQuestionElement(questions[nextIndex], nextIndex);
-          container.appendChild(nextElem);
-          setTimeout(() => nextElem.classList.add('show'), 50);
-          const input = nextElem.querySelector('input,select');
-          if (input) input.focus();
-          setTimeout(() => {
-            nextElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 100);
-        } else {
-          playAudio(audioFiles.processing);
-          setTimeout(showResult, 2000);
-        }
-      } catch (err) {
-        console.error('Error proceeding to next question:', err);
-        alert('حدث خطأ أثناء الانتقال إلى السؤال التالي. حاول مرة أخرى.');
+      let nextIndex = idx + 1;
+      if (nextIndex < questions.length) {
+        const nextElem = createQuestionElement(questions[nextIndex], nextIndex);
+        container.appendChild(nextElem);
+        setTimeout(() => nextElem.classList.add('show'), 50);
+        nextElem.querySelector('input,select').focus();
+        setTimeout(() => {
+          nextElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      } else {
+        playAudio(audioFiles.processing);
+        setTimeout(showResult, 2000);
       }
     }
 
     function addMinutes(timeStr, mins) {
-      try {
-        if (!timeStr || !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeStr)) return timeStr;
-        const [h, m] = timeStr.split(':').map(Number);
-        let totalMins = h * 60 + m + mins;
-        if (totalMins < 0) totalMins += 1440;
-        const newH = Math.floor(totalMins / 60) % 24;
-        const newM = totalMins % 60;
-        return `${newH.toString().padStart(2, '0')}:${newM.toString().padStart(2, '0')}`;
-      } catch (err) {
-        console.error('Error adding minutes:', err);
-        return timeStr;
-      }
+      const [h, m] = timeStr.split(':').map(Number);
+      let totalMins = h * 60 + m + mins;
+      if (totalMins < 0) totalMins += 1440;
+      const newH = Math.floor(totalMins / 60) % 24;
+      const newM = totalMins % 60;
+      return `${newH.toString().padStart(2, '0')}:${newM.toString().padStart(2, '0')}`;
     }
 
     function timeToMinutes(timeStr) {
-      try {
-        if (!timeStr || !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeStr)) return 0;
-        const [h, m] = timeStr.split(':').map(Number);
-        return h * 60 + m;
-      } catch (err) {
-        console.error('Error converting time to minutes:', err);
-        return 0;
-      }
-    }
-
-    function calculateTotalWater() {
-      try {
-        let user = {};
-        questions.forEach((q, i) => { user[i] = answers[i]; });
-        let base = parseFloat(user[0]) * 0.035;
-        if (user[1] === "عالي") base *= 1.20;
-        else if (user[1] === "متوسط") base *= 1.10;
-        if (user[2] === "عالية") base += 0.5 * (parseFloat(user[3]) / 60);
-        else if (user[2] === "متوسطة") base += 0.3 * (parseFloat(user[3]) / 60);
-        else if (user[2] === "منخفضة") base += 0.1 * (parseFloat(user[3]) / 60);
-        if (parseFloat(user[4]) > 40) base += 0.5;
-        else if (parseFloat(user[4]) > 30) base += 0.3;
-        base = Math.max(1.5, Math.min(base, 5.0));
-        return Math.round(base * 1000); // Return in milliliters
-      } catch (err) {
-        console.error('Error calculating total water:', err);
-        return 2000; // Default to 2 liters
-      }
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
     }
 
     function generateWaterDistribution(total_ml, user) {
-      try {
-        const wake_time = user[7] || "06:00";
-        const breakfast_time = user[8] || "08:00";
-        const lunch_time = user[9] || "13:00";
-        const exercise_start = user[5] || "17:00";
-        const exercise_end = user[6] || "18:00";
-        const dinner_time = user[10] || "19:00";
-        const sleep_time = user[11] || "22:30";
-        const activity_level = user[1] || "متوسط";
-        const exercise_intensity = user[2] || "متوسطة";
-        const exercise_duration = parseFloat(user[3]) || 45;
-        const temperature = parseFloat(user[4]) || 25;
+      const wake_time = user[7] || "06:00";
+      const breakfast_time = user[8] || "08:00";
+      const lunch_time = user[9] || "13:00";
+      const exercise_start = user[5] || "17:00";
+      const exercise_end = user[6] || "18:00";
+      const dinner_time = user[10] || "19:00";
+      const sleep_time = user[11] || "22:30";
+      const activity_level = user[1];
+      const exercise_intensity = user[2];
+      const exercise_duration = parseFloat(user[3]) || 45;
+      const temperature = parseFloat(user[4]) || 25;
 
-        const breakfast_minutes = timeToMinutes(breakfast_time);
-        const lunch_minutes = timeToMinutes(lunch_time);
-        let mid_morning_minutes = (breakfast_minutes + lunch_minutes) / 2;
-        if (lunch_minutes < breakfast_minutes) mid_morning_minutes += 720;
-        const mid_morning_time = addMinutes("00:00", Math.round(mid_morning_minutes));
+      const breakfast_minutes = timeToMinutes(breakfast_time);
+      const lunch_minutes = timeToMinutes(lunch_time);
+      let mid_morning_minutes = (breakfast_minutes + lunch_minutes) / 2;
+      if (lunch_minutes < breakfast_minutes) mid_morning_minutes += 720;
+      const mid_morning_time = addMinutes("00:00", Math.round(mid_morning_minutes));
 
-        let awake_duration = (timeToMinutes(sleep_time) - timeToMinutes(wake_time)) / 60;
-        if (awake_duration < 0) awake_duration += 24;
+      let awake_duration = (timeToMinutes(sleep_time) - timeToMinutes(wake_time)) / 60;
+      if (awake_duration < 0) awake_duration += 24;
 
-        let base_percentages = {
-          "استيقاظ": 0.12,
-          "إفطار": 0.08,
-          "منتصف الصباح": 0.10,
-          "غداء": 0.15,
-          "قبل التمرين": 0.10,
-          "أثناء التمرين": 0.12,
-          "بعد التمرين": 0.15,
-          "عشاء": 0.10,
-          "قبل النوم": 0.08
-        };
+      let base_percentages = {
+        "استيقاظ": 0.12,
+        "إفطار": 0.08,
+        "منتصف الصباح": 0.10,
+        "غداء": 0.15,
+        "قبل التمرين": 0.10,
+        "أثناء التمرين": 0.12,
+        "بعد التمرين": 0.15,
+        "عشاء": 0.10,
+        "قبل النوم": 0.08
+      };
 
-        if (exercise_intensity === "عالية" || exercise_duration > 60) {
-          base_percentages["قبل التمرين"] += 0.02;
-          base_percentages["أثناء التمرين"] += 0.03;
-          base_percentages["بعد التمرين"] += 0.03;
-          base_percentages["إفطار"] -= 0.02;
-          base_percentages["منتصف الصباح"] -= 0.03;
-          base_percentages["عشاء"] -= 0.03;
-        }
-        if (temperature > 30) {
-          base_percentages["منتصف الصباح"] += 0.02;
-          base_percentages["غداء"] += 0.02;
-          base_percentages["قبل النوم"] -= 0.02;
-          base_percentages["إفطار"] -= 0.02;
-        }
-        if (activity_level === "عالي") {
-          base_percentages["منتصف الصباح"] += 0.02;
-          base_percentages["قبل التمرين"] += 0.01;
-          base_percentages["عشاء"] -= 0.02;
-          base_percentages["قبل النوم"] -= 0.01;
-        }
-        if (awake_duration < 12) {
-          base_percentages["منتصف الصباح"] -= 0.02;
-          base_percentages["غداء"] += 0.01;
-          base_percentages["عشاء"] += 0.01;
-        }
-
-        const varied_percentages = {};
-        let total_percentage = 0;
-        Object.keys(base_percentages).forEach(key => {
-          const variation = (Math.random() * 0.04 - 0.02);
-          varied_percentages[key] = Math.max(0.05, base_percentages[key] + variation);
-          total_percentage += varied_percentages[key];
-        });
-
-        const normalization_factor = 1 / total_percentage;
-        Object.keys(varied_percentages).forEach(key => {
-          varied_percentages[key] *= normalization_factor;
-        });
-
-        const time_points = {
-          "استيقاظ": wake_time,
-          "إفطار": breakfast_time,
-          "منتصف الصباح": mid_morning_time,
-          "غداء": lunch_time,
-          "قبل التمرين": addMinutes(exercise_start, -30),
-          "أثناء التمرين": exercise_start,
-          "بعد التمرين": exercise_end,
-          "عشاء": dinner_time,
-          "قبل النوم": addMinutes(sleep_time, -30)
-        };
-
-        const schedule = [];
-        Object.keys(varied_percentages).forEach(key => {
-          let ml = Math.round(total_ml * varied_percentages[key]);
-          ml = Math.max(100, Math.min(350, ml));
-          const time24 = time_points[key];
-          const isChecked = completedTimes.includes(time24);
-          schedule.push([key, ml, to12HourFormat(time24), time24, isChecked]);
-        });
-
-        let current_total = schedule.reduce((sum, [, ml]) => sum + ml, 0);
-        if (current_total !== total_ml) {
-          const diff = total_ml - current_total;
-          const max_ml_index = schedule.reduce((max_idx, [, ml], idx) => ml > schedule[max_idx][1] ? idx : max_idx, 0);
-          schedule[max_ml_index][1] += diff;
-          schedule[max_ml_index][1] = Math.max(100, Math.min(350, schedule[max_ml_index][1]));
-        }
-
-        return schedule;
-      } catch (err) {
-        console.error('Error generating water distribution:', err);
-        return [];
+      if (exercise_intensity === "عالية" || exercise_duration > 60) {
+        base_percentages["قبل التمرين"] += 0.02;
+        base_percentages["أثناء التمرين"] += 0.03;
+        base_percentages["بعد التمرين"] += 0.03;
+        base_percentages["إفطار"] -= 0.02;
+        base_percentages["منتصف الصباح"] -= 0.03;
+        base_percentages["عشاء"] -= 0.03;
       }
+      if (temperature > 30) {
+        base_percentages["منتصف الصباح"] += 0.02;
+        base_percentages["غداء"] += 0.02;
+        base_percentages["قبل النوم"] -= 0.02;
+        base_percentages["إفطار"] -= 0.02;
+      }
+      if (activity_level === "عالي") {
+        base_percentages["منتصف الصباح"] += 0.02;
+        base_percentages["قبل التمرين"] += 0.01;
+        base_percentages["عشاء"] -= 0.02;
+        base_percentages["قبل النوم"] -= 0.01;
+      }
+      if (awake_duration < 12) {
+        base_percentages["منتصف الصباح"] -= 0.02;
+        base_percentages["غداء"] += 0.01;
+        base_percentages["عشاء"] += 0.01;
+      }
+
+      const varied_percentages = {};
+      let total_percentage = 0;
+      Object.keys(base_percentages).forEach(key => {
+        const variation = (Math.random() * 0.04 - 0.02);
+        varied_percentages[key] = Math.max(0.05, base_percentages[key] + variation);
+        total_percentage += varied_percentages[key];
+      });
+
+      const normalization_factor = 1 / total_percentage;
+      Object.keys(varied_percentages).forEach(key => {
+        varied_percentages[key] *= normalization_factor;
+      });
+
+      const time_points = {
+        "استيقاظ": wake_time,
+        "إفطار": breakfast_time,
+        "منتصف الصباح": mid_morning_time,
+        "غداء": lunch_time,
+        "قبل التمرين": addMinutes(exercise_start, -30),
+        "أثناء التمرين": exercise_start,
+        "بعد التمرين": exercise_end,
+        "عشاء": dinner_time,
+        "قبل النوم": addMinutes(sleep_time, -30)
+      };
+
+      const schedule = [];
+      Object.keys(varied_percentages).forEach(key => {
+        let ml = Math.round(total_ml * varied_percentages[key]);
+        ml = Math.max(100, Math.min(350, ml));
+        const time24 = time_points[key];
+        const isChecked = completedTimes.includes(time24);
+        schedule.push([key, ml, to12HourFormat(time24), time24, isChecked]);
+      });
+
+      let current_total = schedule.reduce((sum, [, ml]) => sum + ml, 0);
+      if (current_total !== total_ml) {
+        const diff = total_ml - current_total;
+        const max_ml_index = schedule.reduce((max_idx, [, ml], idx) => ml > schedule[max_idx][1] ? idx : max_idx, 0);
+        schedule[max_ml_index][1] += diff;
+        schedule[max_ml_index][1] = Math.max(100, Math.min(350, schedule[max_ml_index][1]));
+      }
+
+      return schedule;
     }
 
     function showResult() {
-      try {
-        const total_ml = calculateTotalWater();
-        const schedule = generateWaterDistribution(total_ml, answers);
+      let user = {};
+      questions.forEach((q, i) => { user[i] = answers[i]; });
 
-        const div = document.createElement('div');
-        div.classList.add('result-card');
-        div.innerHTML = `<strong>💧 الترطيب اليومي المقدر:</strong> ${total_ml / 1000} لتر/يوم`;
-        container.appendChild(div);
-        setTimeout(() => div.classList.add('show'), 50);
-        div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      let base = parseFloat(user[0]) * 0.035;
+      if (user[1] === "عالي") base *= 1.20;
+      else if (user[1] === "متوسط") base *= 1.10;
+      if (user[2] === "عالية") base += 0.5 * (parseFloat(user[3]) / 60);
+      else if (user[2] === "متوسطة") base += 0.3 * (parseFloat(user[3]) / 60);
+      else if (user[2] === "منخفضة") base += 0.1 * (parseFloat(user[3]) / 60);
+      if (parseFloat(user[4]) > 40) base += 0.5;
+      else if (parseFloat(user[4]) > 30) base += 0.3;
+      base = Math.max(1.5, Math.min(base, 5.0));
+      base = Math.round(base * 100) / 100;
 
-        let scheduleDiv = document.createElement('div');
-        scheduleDiv.classList.add('schedule-card');
-        scheduleDiv.id = "scheduleCard";
-        scheduleDiv.innerHTML = "<strong>جدول الترطيب اليومي</strong><br><br>";
+      const div = document.createElement('div');
+      div.classList.add('result-card');
+      div.innerHTML = `<strong>💧 الترطيب اليومي المقدر:</strong> ${base} لتر/يوم`;
+      container.appendChild(div);
+      setTimeout(() => div.classList.add('show'), 50);
+      div.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-        schedule.forEach(([name, ml, time, time24, isChecked], index) => {
-          const line = document.createElement('div');
-          line.classList.add('schedule-line');
-          const timeMlDiv = document.createElement('div');
-          timeMlDiv.classList.add('time-ml');
-          timeMlDiv.innerHTML = `<span>${time}</span><span>${ml} mL</span>`;
-          line.appendChild(timeMlDiv);
-          const checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.checked = isChecked;
-          checkbox.disabled = !isTimeBeforeNow(time24) && !isChecked;
-          checkbox.setAttribute('data-time', time24);
-          checkbox.setAttribute('data-index', index);
-          checkbox.addEventListener('change', (e) => {
-            try {
-              const time = checkbox.getAttribute('data-time');
-              const idx = parseInt(checkbox.getAttribute('data-index'), 10);
-              // Prevent unchecking if already checked
-              if (isChecked) {
-                e.preventDefault();
-                checkbox.checked = true;
-                alert("⚠️ لا يمكن إزالة العلامة بعد تأكيدها.");
-                return;
-              }
-              // Prevent checking if time is in the future
-              if (!isTimeBeforeNow(time)) {
-                e.preventDefault();
-                checkbox.checked = false;
-                alert("⚠️ لا يمكن وضع علامة على موعد لم يحن بعد.");
-                return;
-              }
-              // Handle checking
-              if (checkbox.checked && !completedTimes.includes(time)) {
-                completedTimes.push(time);
-                localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
-                playAudio(audioFiles.check);
-                // Check if all times are completed
-                const allTimesCompleted = schedule.every(([, , , t]) => completedTimes.includes(t));
-                if (allTimesCompleted) {
-                  const successMessage = document.getElementById('successMessage');
-                  if (successMessage) {
-                    successMessage.classList.add('show');
-                    setTimeout(() => {
-                      successMessage.classList.remove('show');
-                    }, 5000);
-                  }
-                }
-              }
-            } catch (err) {
-              console.error('Error handling checkbox change:', err);
-              checkbox.checked = isChecked;
-              alert('حدث خطأ أثناء تحديث حالة المهمة. حاول مرة أخرى.');
-            }
-          });
-          line.appendChild(checkbox);
-          scheduleDiv.appendChild(line);
+      const total_ml = base * 1000;
+      const schedule = generateWaterDistribution(total_ml, user);
+
+      let scheduleDiv = document.createElement('div');
+      scheduleDiv.classList.add('schedule-card');
+      scheduleDiv.id = "scheduleCard";
+      scheduleDiv.innerHTML = "<strong>Your Program</strong><br><br>";
+
+      schedule.forEach(([name, ml, time, time24, isChecked]) => {
+        const line = document.createElement('div');
+        line.classList.add('schedule-line');
+        const timeMlDiv = document.createElement('div');
+        timeMlDiv.classList.add('time-ml');
+        timeMlDiv.innerHTML = `<span>${time}</span><span>${ml} mL</span>`;
+        line.appendChild(timeMlDiv);
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = isChecked;
+        checkbox.disabled = !isTimeBeforeNow(time24) && !isChecked;
+        checkbox.addEventListener('change', (e) => {
+          if (!isTimeBeforeNow(time24) && !checkbox.checked) {
+            e.preventDefault();
+            checkbox.checked = false;
+            alert("⚠️ لا يمكن وضع علامة على موعد لم يحن بعد.");
+            return;
+          }
+          if (checkbox.checked && !completedTimes.includes(time24)) {
+            completedTimes.push(time24);
+            localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
+            playAudio(audioFiles.check);
+          } else if (!checkbox.checked) {
+            completedTimes = completedTimes.filter(t => t !== time24);
+            localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
+          }
         });
+        line.appendChild(checkbox);
+        scheduleDiv.appendChild(line);
+      });
 
-        const downloadBtn = document.createElement("button");
-        downloadBtn.classList.add("download-btn");
-        downloadBtn.setAttribute("title", "تحميل الجدول كصورة");
-        downloadBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+      const downloadBtn = document.createElement("button");
+      downloadBtn.classList.add("download-btn");
+      downloadBtn.setAttribute("title", "تحميل الجدول كصورة");
+      downloadBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
 
-        downloadBtn.addEventListener("click", async () => {
-          try {
-            downloadBtn.classList.add("busy");
-            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      downloadBtn.addEventListener("click", async () => {
+        try {
+          downloadBtn.classList.add("busy");
+          downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            const clone = scheduleDiv.cloneNode(true);
-            const btnInClone = clone.querySelector('.download-btn');
-            if (btnInClone) btnInClone.remove();
-            const restartBtnInClone = clone.querySelector('.restart-btn');
-            if (restartBtnInClone) restartBtnInClone.remove();
-            const checkboxes = clone.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.remove());
+          const clone = scheduleDiv.cloneNode(true);
+          const btnInClone = clone.querySelector('.download-btn');
+          if (btnInClone) btnInClone.remove();
+          const restartBtnInClone = clone.querySelector('.restart-btn');
+          if (restartBtnInClone) restartBtnInClone.remove();
+          const checkboxes = clone.querySelectorAll('input[type="checkbox"]');
+          checkboxes.forEach(cb => cb.remove());
 
-            const isMobile = window.innerWidth <= 480;
-            const baseWidth = isMobile ? window.innerWidth * 0.90 : Math.min(window.innerWidth * 0.85, 620);
-            const fontSize = isMobile ? 18 : 20;
-            const titleFontSize = isMobile ? 22 : 24;
-            const padding = isMobile ? 15 : 20;
-            const linePadding = isMobile ? 8 : 10;
-            const lineMargin = isMobile ? 8 : 10;
+          const isMobile = window.innerWidth <= 480;
+          const baseWidth = isMobile ? window.innerWidth * 0.90 : Math.min(window.innerWidth * 0.85, 620);
+          const fontSize = isMobile ? 18 : 20;
+          const titleFontSize = isMobile ? 22 : 24;
+          const padding = isMobile ? 15 : 20;
+          const linePadding = isMobile ? 8 : 10;
+          const lineMargin = isMobile ? 8 : 10;
 
-            clone.style.position = 'absolute';
-            clone.style.left = '-99999px';
-            clone.style.top = '0';
-            clone.style.width = `${baseWidth}px`;
-            clone.style.height = 'auto';
-            clone.style.minHeight = 'fit-content';
-            clone.style.background = '#000000';
-            clone.style.border = '10px solid #00ffff';
-            clone.style.color = '#00ffff';
-            clone.style.fontFamily = '"Almarai", "Noto Naskh Arabic", Arial, sans-serif';
-            clone.style.fontWeight = '900';
-            clone.style.direction = 'rtl';
-            clone.style.textAlign = 'center';
-            clone.style.letterSpacing = '0.5px';
-            clone.style.wordSpacing = 'normal';
-            clone.style.unicodeBidi = 'embed';
-            clone.style.textRendering = 'optimizeLegibility';
-            clone.style.webkitFontSmoothing = 'antialiased';
-            clone.style.mozOsxFontSmoothing = 'grayscale';
-            clone.style.fontKerning = 'normal';
-            clone.style.padding = `${padding}px`;
-            clone.style.borderRadius = '16px';
-            clone.style.boxShadow = '0 10px 30px rgba(0, 255, 255, 0.6)';
-            clone.style.margin = '0 auto';
-            clone.style.display = 'flex';
-            clone.style.flexDirection = 'column';
-            clone.style.alignItems = 'center';
+          clone.style.position = 'absolute';
+          clone.style.left = '-99999px';
+          clone.style.top = '0';
+          clone.style.width = `${baseWidth}px`;
+          clone.style.height = 'auto';
+          clone.style.minHeight = 'fit-content';
+          clone.style.background = '#000000';
+          clone.style.border = '3px solid #00ffff';
+          clone.style.color = '#00ffff';
+          clone.style.fontFamily = '"Almarai", "Noto Naskh Arabic", Arial, sans-serif';
+          clone.style.fontWeight = '900';
+          clone.style.direction = 'rtl';
+          clone.style.textAlign = 'center';
+          clone.style.letterSpacing = '0.5px';
+          clone.style.wordSpacing = 'normal';
+          clone.style.unicodeBidi = 'embed';
+          clone.style.textRendering = 'optimizeLegibility';
+          clone.style.webkitFontSmoothing = 'antialiased';
+          clone.style.mozOsxFontSmoothing = 'grayscale';
+          clone.style.fontKerning = 'normal';
+          clone.style.padding = `${padding}px`;
+          clone.style.borderRadius = '16px';
+          clone.style.boxShadow = '0 10px 30px rgba(0, 255, 255, 0.6)';
+          clone.style.margin = '0 auto';
+          clone.style.display = 'flex';
+          clone.style.flexDirection = 'column';
+          clone.style.alignItems = 'center';
 
-            const title = clone.querySelector('strong');
-            if (title) {
-              title.style.fontSize = `${titleFontSize}px`;
-              title.style.marginBottom = '20px';
-              title.style.display = 'block';
-              title.style.color = '#00ffff';
-              title.style.fontWeight = '900';
-              title.style.textAlign = 'center';
-              title.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.4)';
+          const title = clone.querySelector('strong');
+          if (title) {
+            title.style.fontSize = `${titleFontSize}px`;
+            title.style.marginBottom = '20px';
+            title.style.display = 'block';
+            title.style.color = '#00ffff';
+            title.style.fontWeight = '900';
+            title.style.textAlign = 'center';
+            title.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.4)';
+          }
+
+          const lines = clone.querySelectorAll('.schedule-line');
+          lines.forEach(line => {
+            line.style.display = 'flex';
+            line.style.flexDirection = 'column';
+            line.style.alignItems = 'center';
+            line.style.width = '100%';
+            line.style.maxWidth = '420px';
+            line.style.padding = `${linePadding}px`;
+            line.style.margin = `${lineMargin}px auto`;
+            line.style.background = 'linear-gradient(135deg, rgba(0, 255, 255, 0.25), rgba(106, 17, 203, 0.25))';
+            line.style.boxShadow = '0 2px 10px rgba(0, 255, 255, 0.3)';
+            const timeMl = line.querySelector('.time-ml');
+            if (timeMl) {
+              timeMl.style.display = 'flex';
+              timeMl.style.justifyContent = 'space-between';
+              timeMl.style.width = '100%';
             }
-
-            const lines = clone.querySelectorAll('.schedule-line');
-            lines.forEach(line => {
-              line.style.display = 'flex';
-              line.style.flexDirection = 'column';
-              line.style.alignItems = 'center';
-              line.style.width = '100%';
-              line.style.maxWidth = '420px';
-              line.style.padding = `${linePadding}px`;
-              line.style.margin = `${lineMargin}px auto`;
-              line.style.background = 'linear-gradient(135deg, rgba(0, 255, 255, 0.25), rgba(106, 17, 203, 0.25))';
-              line.style.boxShadow = '0 2px 10px rgba(0, 255, 255, 0.3)';
-              const timeMl = line.querySelector('.time-ml');
-              if (timeMl) {
-                timeMl.style.display = 'flex';
-                timeMl.style.justifyContent = 'space-between';
-                timeMl.style.width = '100%';
-              }
-              const spans = line.querySelectorAll('span');
-              spans.forEach(span => {
-                span.style.display = 'inline-block';
-                span.style.fontSize = `${fontSize}px`;
-                span.style.fontWeight = '900';
-                span.style.color = '#00ffff';
-                span.style.whiteSpace = 'nowrap';
-                span.style.overflow = 'visible';
-                span.style.unicodeBidi = 'embed';
-                span.style.textAlign = 'center';
-                span.style.width = '50%';
-                span.style.opacity = '0.95';
-                span.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.3)';
-              });
+            const spans = line.querySelectorAll('span');
+            spans.forEach(span => {
+              span.style.display = 'inline-block';
+              span.style.fontSize = `${fontSize}px`;
+              span.style.fontWeight = '900';
+              span.style.color = '#00ffff';
+              span.style.whiteSpace = 'nowrap';
+              span.style.overflow = 'visible';
+              span.style.unicodeBidi = 'embed';
+              span.style.textAlign = 'center';
+              span.style.width = '50%';
+              span.style.opacity = '0.95';
+              span.style.textShadow = '0 0 5px rgba(0, 255, 255, 0.3)';
             });
+          });
 
-            document.body.appendChild(clone);
-            await document.fonts.load(`900 ${fontSize}px Almarai`);
-            await document.fonts.load(`900 ${fontSize}px "Noto Naskh Arabic"`);
-            await document.fonts.ready;
-            await new Promise(resolve => setTimeout(resolve, 300));
+          document.body.appendChild(clone);
+          clone.offsetHeight;
+          await document.fonts.load(`900 ${fontSize}px Almarai`);
+          await document.fonts.load(`900 ${fontSize}px "Noto Naskh Arabic"`);
+          await document.fonts.ready;
+          await new Promise(resolve => setTimeout(resolve, 300));
 
-            const pixelRatio = window.devicePixelRatio || 1;
-            const scale = isMobile ? 4 : 3;
-            const canvasWidth = Math.round(clone.getBoundingClientRect().width * scale);
-            const canvasHeight = Math.round(clone.getBoundingClientRect().height * scale);
-            const opts = {
-              scale: scale,
-              useCORS: true,
-              allowTaint: true,
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              logging: false,
-              width: canvasWidth / scale,
-              height: canvasHeight / scale,
-              windowWidth: clone.scrollWidth,
-              windowHeight: clone.scrollHeight
-            };
+          const pixelRatio = window.devicePixelRatio || 1;
+          const scale = isMobile ? 4 : 3;
+          const canvasWidth = Math.round(clone.getBoundingClientRect().width * scale);
+          const canvasHeight = Math.round(clone.getBoundingClientRect().height * scale);
+          const opts = {
+            scale: scale,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            logging: false,
+            width: canvasWidth / scale,
+            height: canvasHeight / scale,
+            windowWidth: clone.scrollWidth,
+            windowHeight: clone.scrollHeight
+          };
 
-            const canvas = await html2canvas(clone, opts);
-            clone.remove();
+          const canvas = await html2canvas(clone, opts);
+          clone.remove();
 
-            canvas.toBlob((blob) => {
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement("a");
-              const now = new Date();
-              const pad = n => n.toString().padStart(2, '0');
-              const fname = `hydration_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.png`;
-              link.download = fname;
-              link.href = url;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
-              downloadBtn.innerHTML = '<i class="fas fa-check"></i>';
-              setTimeout(() => {
-                downloadBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
-                downloadBtn.classList.remove("busy");
-              }, 1200);
-              setTimeout(() => playAudio(audioFiles.download), 3000);
-            }, 'image/png', 1.0);
-
-          } catch (err) {
-            console.error('Error downloading schedule:', err);
-            alert("حدث خطأ أثناء إنشاء الصورة. حاول مرة أخرى.");
-            downloadBtn.classList.remove("busy");
-            downloadBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
-          }
-        });
-
-        const restartBtn = document.createElement("button");
-        restartBtn.classList.add("restart-btn");
-        restartBtn.setAttribute("title", "إعادة تشغيل التطبيق");
-        restartBtn.innerHTML = '<i class="fas fa-redo"></i>';
-        restartBtn.addEventListener("click", () => {
-          try {
-            restartBtn.classList.add("busy");
-            restartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+          canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const now = new Date();
+            const pad = n => n.toString().padStart(2, '0');
+            const fname = `hydration_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.png`;
+            link.download = fname;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            downloadBtn.innerHTML = '<i class="fas fa-check"></i>';
             setTimeout(() => {
-              resetApp();
-              restartBtn.classList.remove("busy");
-              restartBtn.innerHTML = '<i class="fas fa-redo"></i>';
-            }, 1000);
-          } catch (err) {
-            console.error('Error restarting app:', err);
-            alert('حدث خطأ أثناء إعادة تشغيل التطبيق. حاول مرة أخرى.');
-            restartBtn.classList.remove("busy");
-            restartBtn.innerHTML = '<i class="fas fa-redo"></i>';
-          }
-        });
+              downloadBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+              downloadBtn.classList.remove("busy");
+            }, 1200);
+            setTimeout(() => playAudio(audioFiles.download), 3000);
+          }, 'image/png', 1.0);
 
-        scheduleDiv.appendChild(downloadBtn);
-        scheduleDiv.appendChild(restartBtn);
-        container.appendChild(scheduleDiv);
+        } catch (err) {
+          console.error(err);
+          alert("حدث خطأ أثناء إنشاء الصورة. حاول مرة أخرى.");
+          downloadBtn.classList.remove("busy");
+          downloadBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+        }
+      });
+
+      const restartBtn = document.createElement("button");
+      restartBtn.classList.add("restart-btn");
+      restartBtn.setAttribute("title", "إعادة تشغيل التطبيق");
+      restartBtn.innerHTML = '<i class="fas fa-redo"></i>';
+      restartBtn.addEventListener("click", () => {
+        restartBtn.classList.add("busy");
+        restartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         setTimeout(() => {
-          scheduleDiv.classList.add('show');
-          hideProgressBar();
-          setTimeout(() => playAudio(audioFiles.program), 1000);
-          // Show success message if all times are completed
-          const allTimesCompleted = schedule.every(([, , , time24]) => completedTimes.includes(time24));
-          if (allTimesCompleted) {
-            const successMessage = document.getElementById('successMessage');
-            if (successMessage) {
-              successMessage.classList.add('show');
-              setTimeout(() => {
-                successMessage.classList.remove('show');
-              }, 5000);
-            }
-          }
-        }, 50);
-        scheduleDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      } catch (err) {
-        console.error('Error showing result:', err);
-        alert('حدث خطأ أثناء عرض النتائج. حاول مرة أخرى.');
-      }
+          resetApp();
+          restartBtn.classList.remove("busy");
+          restartBtn.innerHTML = '<i class="fas fa-redo"></i>';
+        }, 1000);
+      });
+
+      scheduleDiv.appendChild(downloadBtn);
+      scheduleDiv.appendChild(restartBtn);
+      container.appendChild(scheduleDiv);
+      setTimeout(() => {
+        scheduleDiv.classList.add('show');
+        hideProgressBar();
+        setTimeout(() => playAudio(audioFiles.program), 1000);
+        // Show congratulatory message after 1 second
+        setTimeout(() => {
+          const congratsDiv = document.createElement('div');
+          congratsDiv.classList.add('congrats-message');
+          congratsDiv.innerHTML = 'تهانينا قم بتحديث الصفحة';
+          document.body.appendChild(congratsDiv);
+          setTimeout(() => congratsDiv.classList.add('show'), 50);
+          setTimeout(() => {
+            congratsDiv.classList.remove('show');
+            congratsDiv.addEventListener('transitionend', () => congratsDiv.remove(), { once: true });
+          }, 5000);
+        }, 1000);
+      }, 50);
+      scheduleDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
 
-    // Save state before unloading
-    window.addEventListener('beforeunload', () => {
-      try {
-        localStorage.setItem('hydrationAnswers', JSON.stringify(answers));
-        localStorage.setItem('lastAnsweredIndex', lastAnsweredIndex);
-        localStorage.setItem('completedTimes', JSON.stringify(completedTimes));
-        localStorage.setItem('lastDate', new Date().toISOString().split('T')[0]);
-      } catch (err) {
-        console.error('Error saving state before unload:', err);
+    // Clear storage on new day
+    window.addEventListener('load', () => {
+      const lastDate = localStorage.getItem('lastDate');
+      const today = new Date().toISOString().split('T')[0];
+      if (lastDate !== today) {
+        localStorage.removeItem('hydrationAnswers');
+        localStorage.removeItem('lastAnsweredIndex');
+        localStorage.removeItem('completedTimes');
+        localStorage.setItem('lastDate', today);
+        answers = [];
+        lastAnsweredIndex = -1;
+        completedTimes = [];
       }
     });
   </script>
