@@ -693,32 +693,37 @@
     }
 
     function startApp() {
-      playAudio(audioFiles.splash);
-      const splash = document.getElementById('splash');
-      splash.classList.add('hide');
-      splash.addEventListener('transitionend', () => {
-        splash.remove();
-        document.querySelector('.container').classList.add('show');
-        container.innerHTML = '<div class="progress-bar-container" id="progressBarContainer"><div class="progress-aqua-line" id="progressAquaLine"></div><div class="progress-bar" id="progressBar"></div></div>';
-        for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
-          const q = createQuestionElement(questions[i], i);
-          container.appendChild(q);
-          q.querySelector('input,select').value = answers[i] || '';
-          setTimeout(() => q.classList.add('show'), 50);
-        }
-        if (lastAnsweredIndex < questions.length - 1) {
-          const nextIndex = lastAnsweredIndex + 1;
-          const nextQ = createQuestionElement(questions[nextIndex], nextIndex);
-          container.appendChild(nextQ);
-          setTimeout(() => nextQ.classList.add('show'), 50);
-          nextQ.querySelector('input,select').focus();
-        } else {
-          showResult();
-        }
-        updateProgressBar();
-        setTimeout(() => playAudio(audioFiles.welcome), 1000);
-      }, { once: true });
+  playAudio(audioFiles.splash);
+  const splash = document.getElementById('splash');
+  splash.classList.add('hide');
+  
+  // إضافة تأخير 2 ثواني قبل الانتقال للصفحة الثانية
+  setTimeout(() => {
+    splash.remove();
+    document.querySelector('.container').classList.add('show');
+    container.innerHTML = '<div class="progress-bar-container" id="progressBarContainer"><div class="progress-aqua-line" id="progressAquaLine"></div><div class="progress-bar" id="progressBar"></div></div>';
+    
+    for (let i = 0; i <= lastAnsweredIndex && i < questions.length; i++) {
+      const q = createQuestionElement(questions[i], i);
+      container.appendChild(q);
+      q.querySelector('input,select').value = answers[i] || '';
+      setTimeout(() => q.classList.add('show'), 50);
     }
+    
+    if (lastAnsweredIndex < questions.length - 1) {
+      const nextIndex = lastAnsweredIndex + 1;
+      const nextQ = createQuestionElement(questions[nextIndex], nextIndex);
+      container.appendChild(nextQ);
+      setTimeout(() => nextQ.classList.add('show'), 50);
+      nextQ.querySelector('input,select').focus();
+    } else {
+      showResult();
+    }
+    
+    updateProgressBar();
+    setTimeout(() => playAudio(audioFiles.welcome), 1000);
+  }, 2000); // 2000 ميلي ثانية = 2 ثانية  ✅
+}
 
     window.addEventListener('load', () => {
       const splash = document.getElementById('splash');
@@ -1275,4 +1280,3 @@
   </script>
 </body>
 </html>
-
